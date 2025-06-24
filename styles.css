@@ -1,76 +1,104 @@
-// Polyfill para compatibilidad
-if (!Promise.allSettled) {
-    Promise.allSettled = promises =>
-        Promise.all(
-            promises.map(p =>
-                p
-                    .then(value => ({ status: "fulfilled", value }))
-                    .catch(reason => ({ status: "rejected", reason }))
-            )
-        );
+/* Añadir al inicio del CSS */
+:root {
+    --mobile-breakpoint: 768px;
+    --tablet-breakpoint: 992px;
 }
 
-// Verificar si estamos en GitHub Pages
-const isGitHubPages = window.location.hostname.includes('github.io');
-
-class PresentationApp {
-    constructor() {
-        // Configuración base para GitHub Pages
-        this.basePath = isGitHubPages ? 
-            `/${window.location.pathname.split('/')[1]}` : 
-            '';
-        
-        // Resto del código igual que antes...
+/* Añadir reglas específicas para mobile */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 100%;
+        position: fixed;
+        bottom: 0;
+        top: auto;
+        height: auto;
+        flex-direction: row;
+        padding: 0.5rem;
+        z-index: 1000;
     }
-
-    // Modificar métodos que cargan recursos
-    async loadTemplates() {
-        try {
-            const response = await fetch(`${this.basePath}/templates.json`);
-            this.templates = await response.json();
-            this.renderTemplates();
-        } catch (error) {
-            console.error("Error loading templates:", error);
-            // Cargar templates por defecto
-            this.templates = [
-                { id: 'default', name: 'Predeterminada', category: 'all', 
-                  thumbnail: `${this.basePath}/assets/templates/default.jpg` },
-                // ... más templates
-            ];
-            this.renderTemplates();
-        }
+    
+    .main-content {
+        margin-left: 0;
+        margin-bottom: 60px; /* Altura del sidebar móvil */
     }
-
-    // Modificar URLs de imágenes
-    handleImageUpload(event, slideNum) {
-        const file = event.target.files[0];
-        if (!file) return;
-
-        // Verificar si es GitHub Pages para usar FileReader
-        if (isGitHubPages) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                this.updateImagePreview(e.target.result, slideNum);
-            };
-            reader.readAsDataURL(file);
-        } else {
-            // Lógica normal para otros entornos
-        }
+    
+    .logo h1 {
+        display: none;
+    }
+    
+    .main-nav ul {
+        display: flex;
+        justify-content: space-around;
+        width: 100%;
+    }
+    
+    .main-nav li span {
+        display: none;
+    }
+    
+    .main-nav i {
+        font-size: 1.5rem;
+    }
+    
+    .user-actions {
+        display: none;
+    }
+    
+    /* Ajustes para el editor en móviles */
+    .workspace {
+        flex-direction: column;
+    }
+    
+    .slides-panel {
+        width: 100%;
+        height: 120px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        flex-direction: row;
+    }
+    
+    .slides-list {
+        flex-direction: row;
+    }
+    
+    .slide-thumbnail {
+        width: 160px;
+        height: 90px;
+        flex-shrink: 0;
+    }
+    
+    .properties-panel {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 90%;
+        height: 100%;
+        transition: right 0.3s ease;
+        z-index: 1001;
+    }
+    
+    .properties-panel.open {
+        right: 0;
     }
 }
 
-// Inicialización segura
-document.addEventListener('DOMContentLoaded', () => {
-    try {
-        new PresentationApp();
-    } catch (error) {
-        console.error("Error initializing app:", error);
-        document.body.innerHTML = `
-            <div class="error-container">
-                <h2>Error al cargar la aplicación</h2>
-                <p>Por favor, recarga la página o intenta desde otro dispositivo.</p>
-                <button onclick="window.location.reload()">Recargar</button>
-            </div>
-        `;
-    }
-});
+/* Añadir para el error container */
+.error-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    text-align: center;
+    padding: 2rem;
+}
+
+.error-container button {
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    background: #4361ee;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
